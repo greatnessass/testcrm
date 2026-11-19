@@ -364,3 +364,13 @@ def get_manager_schedule(db: Session, manager_id: int, date_str: str) -> dict:
             for m in meetings
         ],
     }
+    
+def get_meeting_history(db: Session, meeting_id: int):
+    meeting = db.query(models.Meeting).filter(models.Meeting.id == meeting_id).first()
+    if not meeting:
+        raise NotFoundError(f"Встреча {meeting_id} не найдена.")
+    return [
+        {"action": h.action, "changed_at": h.changed_at, "previous": h.previous_scheduled_at, "new": h.new_scheduled_at}
+        for h in meeting.history
+    ]
+    

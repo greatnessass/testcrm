@@ -71,3 +71,7 @@ def get_schedule(
     db: Session = Depends(get_db),
 ):
     return services.get_manager_schedule(db, manager_id, date)
+
+@router.get("/meetings/{meeting_id}/history")
+def get_meeting_history(meeting_id: int, db: Session = Depends(get_db)):
+    return services.get_meeting_history(db, meeting_id)
