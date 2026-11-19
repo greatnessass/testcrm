@@ -24,17 +24,6 @@ CREATE TABLE IF NOT EXISTS companies (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Звонки (результаты обзвона)
-CREATE TABLE IF NOT EXISTS calls (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    company_id INTEGER NOT NULL REFERENCES companies(id),
-    manager_id INTEGER NOT NULL REFERENCES managers(id),
-    result TEXT NOT NULL CHECK (result IN ('no_answer', 'refused', 'meeting_set')),
-    meeting_id INTEGER REFERENCES meetings(id),
-    called_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    note TEXT
-);
-
 -- Встречи с менеджерами
 CREATE TABLE IF NOT EXISTS meetings (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -46,6 +35,17 @@ CREATE TABLE IF NOT EXISTS meetings (
     original_scheduled_at TIMESTAMP,   -- UTC — время первой записи встречи
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Звонки (результаты обзвона)
+CREATE TABLE IF NOT EXISTS calls (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    company_id INTEGER NOT NULL REFERENCES companies(id),
+    manager_id INTEGER NOT NULL REFERENCES managers(id),
+    result TEXT NOT NULL CHECK (result IN ('no_answer', 'refused', 'meeting_set')),
+    meeting_id INTEGER REFERENCES meetings(id),
+    called_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    note TEXT
 );
 
 -- История изменений встреч (переносы, отмены)
