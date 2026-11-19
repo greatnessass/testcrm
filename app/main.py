@@ -15,9 +15,13 @@ app = FastAPI(title="CRM API", version="1.0.0")
 @app.exception_handler(IntegrityError)
 async def integrity_error_handler(request, exc: IntegrityError):
     """Сеть безопасности: любая ошибка целостности БД (уникальность, FK) возвращает 409, а не 500."""
+    # Выводим ошибку в консоль сервера (для отладки)
+    print(f"Ошибка БД: {exc.orig}")
+    
+    # Возвращаем красивый JSON клиенту
     return JSONResponse(
         status_code=409,
-        content={"detail": "Конфликт данных: нарушение ограничения уникальности или связей в базе данных."},
+        content={"detail": "Конфликт данных: возможно, дубликат БИН или неверная ссылка."},
     )
 
 
