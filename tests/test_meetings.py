@@ -62,7 +62,7 @@ def test_meeting_at_1730_fails(client):
 
 
 def test_meeting_at_0830_fails(client):
-    """Встреча в 08:30 Алматы (03:30 UTC) — отказ,開始 до 09:00."""
+    """Встреча в 08:30 Алматы (03:30 UTC) — отказ, начало до 09:00."""
     manager = _make_manager(client)
     company = _make_company(client)
     resp = _make_meeting(client, manager["id"], company["id"], "2026-11-18T03:30:00+00:00")

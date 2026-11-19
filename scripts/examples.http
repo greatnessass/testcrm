@@ -1,0 +1,123 @@
+@baseUrl = http://localhost:8000
+@contentType = application/json
+
+### 0. Проверка, что сервер жив
+GET {{baseUrl}}/health
+
+### 1. Создать менеджера (нужен для встреч)
+# @name createManager
+POST {{baseUrl}}/managers
+Content-Type: {{contentType}}
+
+{
+  "name": "Иван Иванов",
+  "email": "ivan@example.com",
+  "phone": "+77700000000"
+}
+
+### 2. Создать компанию 1
+# @name createCompany1
+POST {{baseUrl}}/companies
+Content-Type: {{contentType}}
+
+{
+  "name": "ТОО Альфа",
+  "bin": "1234567890123",
+  "phone": "+77777777777",
+  "status": "new"
+}
+
+### 3. Создать компанию 2 (для теста конфликтов)
+# @name createCompany2
+POST {{baseUrl}}/companies
+Content-Type: {{contentType}}
+
+{
+  "name": "ТОО Бета",
+  "bin": "9876543210987",
+  "phone": "+77777777778",
+  "status": "new"
+}
+
+### 4. Получить список компаний с фильтром
+GET {{baseUrl}}/companies?status=new&skip=0&limit=50
+
+### 5. Успешная встреча: 17:00 по Алматы (12:00 UTC) — должна создаться
+# @name createMeeting17
+POST {{baseUrl}}/meetings
+Content-Type: {{contentType}}
+
+{
+  "company_id": 1,
+  "manager_id": 1,
+  "scheduled_at": "2026-11-18T12:00:00Z",
+  "note": "Успешная встреча в 17:00"
+}
+
+### 6. ПРОВЕРКА ОШИБКИ: Встреча 17:30 по Алматы (12:30 UTC) — должна вернуть 422
+POST {{baseUrl}}/meetings
+Content-Type: {{contentType}}
+
+{
+  "company_id": 2,
+  "manager_id": 1,
+  "scheduled_at": "2026-11-18T12:30:00Z",
+  "note": "Должно упасть с ошибкой"
+}
+
+### 7. ПРОВЕРКА КОНФЛИКТА: Встреча на то же время 17:00 (12:00 UTC) для компании 2 — должна вернуть 409
+POST {{baseUrl}}/meetings
+Content-Type: {{contentType}}
+
+{
+  "company_id": 2,
+  "manager_id": 1,
+  "scheduled_at": "2026-11-18T12:00:00Z",
+  "note": "Должно упасть с 409 конфликт"
+}
+
+### 8. Звонок с meeting_set БЕЗ meeting_id — должен вернуть 422
+POST {{baseUrl}}/calls
+Content-Type: {{contentType}}
+
+{
+  "company_id": 1,
+  "manager_id": 1,
+  "result": "meeting_set",
+  "note": "Должно упасть, нет meeting_id"
+}
+
+### 9. Успешный звонок с meeting_set (создаем связь с встречей)
+# Примечание: id встречи может быть 1 или другое, смотри ответ из шага 5
+POST {{baseUrl}}/calls
+Content-Type: {{contentType}}
+
+{
+  "company_id": 1,
+  "manager_id": 1,
+  "result": "meeting_set",
+  "meeting_id": 1,
+  "note": "Успешный звонок"
+}
+
+### 10. Расписание менеджера на 18 ноября
+GET {{baseUrl}}/managers/1/schedule?date=2026-11-18
+
+### 11. Перенос встречи на 14:00 (09:00 UTC)
+PATCH {{baseUrl}}/meetings/1
+Content-Type: {{contentType}}
+
+{
+  "action": "reschedule",
+  "scheduled_at": "2026-11-18T09:00:00Z",
+  "note": "Перенесли на 14:00"
+}
+
+### 12. Отмена встречи
+PATCH {{baseUrl}}/meetings/1
+Content-Type: {{contentType}}
+
+{
+  "action": "cancel",
+  "note": "Клиент отказался"
+}
