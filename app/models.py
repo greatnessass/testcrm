@@ -10,6 +10,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from app.database import Base
+from app.services import MEETING_DURATION_MINUTES
 
 
 class CompanyStatus(str, enum.Enum):
@@ -84,7 +85,7 @@ class Meeting(Base):
     company_id = Column(Integer, ForeignKey("companies.id"), nullable=False, index=True)
     manager_id = Column(Integer, ForeignKey("managers.id"), nullable=False, index=True)
     scheduled_at = Column(DateTime, nullable=False, index=True)  # UTC
-    duration_minutes = Column(Integer, default=60)
+    duration_minutes = Column(Integer, default=MEETING_DURATION_MINUTES)
     status = Column(String, default=MeetingStatus.SCHEDULED.value)
     original_scheduled_at = Column(DateTime, nullable=True)  # UTC — первое запланированное время
     created_at = Column(DateTime, default=func.now())

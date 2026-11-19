@@ -21,7 +21,8 @@ ALMATY = ZoneInfo("Asia/Almaty")
 UTC = ZoneInfo("UTC")
 
 # Ровно 60 минут на встречу.
-MEETING_DURATION = timedelta(minutes=60)
+MEETING_DURATION_MINUTES = 60
+MEETING_DURATION = timedelta(minutes=MEETING_DURATION_MINUTES)
 
 # Рабочие часы по Алматы: пн–пт, 09:00–18:00.
 WORK_START_HOUR = 9
